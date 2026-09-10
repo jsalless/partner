@@ -47,38 +47,42 @@ export default function Home() {
         </div>
 
         {/* Calendar Widget */}
-        <div className="bg-black/80 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-white shadow-xl h-[340px] flex flex-col">
-          <div className="flex justify-between items-center mb-4">
+        <div className="bg-[#1b2541] border border-[#f00a98]/30 rounded-2xl p-6 text-white shadow-xl h-[340px] flex flex-col relative overflow-hidden">
+          {/* Decorative blur blob */}
+          <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-[#f00a98]/20 blur-[50px] rounded-full pointer-events-none"></div>
+          <div className="absolute bottom-[-50px] left-[-50px] w-32 h-32 bg-[#fbbf24]/20 blur-[50px] rounded-full pointer-events-none"></div>
+          
+          <div className="flex justify-between items-center mb-4 relative z-10">
             <h3 className="font-semibold text-lg">Eventos</h3>
-            <div className="flex items-center space-x-2 text-red-500 text-sm font-medium">
-              <button className="hover:text-red-400">←</button>
+            <div className="flex items-center space-x-2 text-[#fbbf24] text-sm font-medium">
+              <button className="hover:text-[#f59e0b] transition-colors">←</button>
               <span>Outubro</span>
-              <button className="hover:text-red-400">→</button>
+              <button className="hover:text-[#f59e0b] transition-colors">→</button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-2 mb-2">
+          <div className="grid grid-cols-7 gap-2 mb-2 relative z-10">
             {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map(day => (
-              <div key={day} className="text-center text-xs font-medium text-zinc-400">
+              <div key={day} className="text-center text-xs font-semibold text-[#f00a98]">
                 {day}
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-y-3 gap-x-2 flex-1 content-center items-center">
+          <div className="grid grid-cols-7 gap-y-3 gap-x-2 flex-1 content-center items-center relative z-10">
             {[...Array(31)].map((_, i) => {
               const day = i + 1;
               const isToday = day === 10;
               const isEvent = [14, 16, 19].includes(day);
 
-              let className = "w-8 h-8 md:w-9 md:h-9 mx-auto flex items-center justify-center rounded-xl text-sm font-medium transition-colors cursor-pointer ";
+              let className = "w-8 h-8 md:w-9 md:h-9 mx-auto flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ";
 
               if (isToday) {
-                className += "bg-[#ef4444] text-white";
+                className += "bg-[#f00a98] text-white shadow-lg shadow-[#f00a98]/40 scale-110";
               } else if (isEvent) {
-                className += "border border-[#ef4444] text-white hover:bg-zinc-700";
+                className += "bg-[#fbbf24] text-[#1b2541] hover:bg-[#f59e0b] hover:scale-110 shadow-md shadow-[#fbbf24]/20";
               } else {
-                className += "text-zinc-300 hover:bg-zinc-700";
+                className += "text-zinc-300 hover:bg-white/10 hover:text-white";
               }
 
               return (
@@ -95,37 +99,37 @@ export default function Home() {
         {/* Events List */}
         <div className="flex flex-col justify-between h-[340px] gap-4 overflow-y-auto pr-2">
           {/* Event 1 */}
-          <div className="bg-white rounded-2xl p-3 flex items-center space-x-4 shadow-sm">
-            <div className="bg-[#ffb3b3] w-[72px] h-[72px] rounded-2xl flex flex-col justify-center items-center shrink-0">
-              <span className="text-2xl font-black text-[#f43f5e]">14</span>
-              <span className="text-xs font-bold text-white mt-[-2px]">DOM</span>
+          <div className="bg-white rounded-2xl p-3 flex items-center space-x-4 shadow-sm border border-transparent hover:border-[#fbbf24]/50 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group">
+            <div className="bg-[#1b2541] group-hover:bg-[#fbbf24] transition-colors duration-300 w-[72px] h-[72px] rounded-2xl flex flex-col justify-center items-center shrink-0">
+              <span className="text-2xl font-black text-[#fbbf24] group-hover:text-[#1b2541] transition-colors duration-300">14</span>
+              <span className="text-xs font-bold text-zinc-300 group-hover:text-[#1b2541]/80 mt-[-2px] transition-colors duration-300">DOM</span>
             </div>
             <div>
-              <h4 className="font-bold text-zinc-900 text-[17px] leading-tight mb-1">Feira Cultural da Praça</h4>
+              <h4 className="font-bold text-zinc-900 text-[17px] leading-tight mb-1 group-hover:text-[#f59e0b] transition-colors duration-300">Feira Cultural da Praça</h4>
               <p className="text-[13px] text-zinc-600 line-clamp-2 leading-snug">A feira cultural estará ...</p>
             </div>
           </div>
 
           {/* Event 2 */}
-          <div className="bg-white rounded-2xl p-3 flex items-center space-x-4 shadow-sm">
-            <div className="bg-[#ffb3b3] w-[72px] h-[72px] rounded-2xl flex flex-col justify-center items-center shrink-0">
-              <span className="text-2xl font-black text-[#f43f5e]">16</span>
-              <span className="text-xs font-bold text-white mt-[-2px]">TER</span>
+          <div className="bg-white rounded-2xl p-3 flex items-center space-x-4 shadow-sm border border-transparent hover:border-[#fbbf24]/50 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group">
+            <div className="bg-[#1b2541] group-hover:bg-[#fbbf24] transition-colors duration-300 w-[72px] h-[72px] rounded-2xl flex flex-col justify-center items-center shrink-0">
+              <span className="text-2xl font-black text-[#fbbf24] group-hover:text-[#1b2541] transition-colors duration-300">16</span>
+              <span className="text-xs font-bold text-zinc-300 group-hover:text-[#1b2541]/80 mt-[-2px] transition-colors duration-300">TER</span>
             </div>
             <div>
-              <h4 className="font-bold text-zinc-900 text-[17px] leading-tight mb-1">Aulas de flauta</h4>
+              <h4 className="font-bold text-zinc-900 text-[17px] leading-tight mb-1 group-hover:text-[#f59e0b] transition-colors duration-300">Aulas de flauta</h4>
               <p className="text-[13px] text-zinc-600 line-clamp-2 leading-snug">Flautistas do DF, as aulas de flauta transversal estão de v...</p>
             </div>
           </div>
 
           {/* Event 3 */}
-          <div className="bg-white rounded-2xl p-3 flex items-center space-x-4 shadow-sm">
-            <div className="bg-[#ffb3b3] w-[72px] h-[72px] rounded-2xl flex flex-col justify-center items-center shrink-0">
-              <span className="text-2xl font-black text-[#f43f5e]">19</span>
-              <span className="text-xs font-bold text-white mt-[-2px]">SEX</span>
+          <div className="bg-white rounded-2xl p-3 flex items-center space-x-4 shadow-sm border border-transparent hover:border-[#fbbf24]/50 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer group">
+            <div className="bg-[#1b2541] group-hover:bg-[#fbbf24] transition-colors duration-300 w-[72px] h-[72px] rounded-2xl flex flex-col justify-center items-center shrink-0">
+              <span className="text-2xl font-black text-[#fbbf24] group-hover:text-[#1b2541] transition-colors duration-300">19</span>
+              <span className="text-xs font-bold text-zinc-300 group-hover:text-[#1b2541]/80 mt-[-2px] transition-colors duration-300">SEX</span>
             </div>
             <div>
-              <h4 className="font-bold text-zinc-900 text-[17px] leading-tight mb-1">Dedé espetos</h4>
+              <h4 className="font-bold text-zinc-900 text-[17px] leading-tight mb-1 group-hover:text-[#f59e0b] transition-colors duration-300">Dedé espetos</h4>
               <p className="text-[13px] text-zinc-600 line-clamp-2 leading-snug">Dedé espetos fará uma aparição com muito churrasco no Gama</p>
             </div>
           </div>

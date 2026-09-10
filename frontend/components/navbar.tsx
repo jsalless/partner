@@ -25,6 +25,13 @@ export function Navbar() {
           <span>Início</span>
         </Link>
         <Link
+          href="/equipes"
+          className="flex items-center space-x-3 px-4 py-3 text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-xl transition-colors font-medium"
+        >
+          <BsFillPeopleFill size={20} />
+          <span>Equipes</span>
+        </Link>
+        <Link
           href="/projetos"
           className="flex items-center space-x-3 px-4 py-3 text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-xl transition-colors font-medium"
         >
@@ -37,13 +44,6 @@ export function Navbar() {
         >
           <FaChartSimple size={20} />
           <span>Power BI</span>
-        </Link>
-        <Link
-          href="/sugerir"
-          className="flex items-center space-x-3 px-4 py-3 text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-xl transition-colors font-medium"
-        >
-          <BsFillPeopleFill size={20} />
-          <span>Equipes</span>
         </Link>
       </div>
     </nav>

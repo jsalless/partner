@@ -1,0 +1,525 @@
+.page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    background: #e7e2d3;
+    align-items: center;
+}
+
+.imageSection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    width: 100%;
+}
+
+.image {
+    width: 100%;
+    max-width: 46rem;
+    height: auto;
+    max-height: 85vh;
+    object-fit: contain;
+}
+
+.formSide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.card {
+    width: min(100%, 52rem);
+    height: 35rem;
+    position: relative;
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 45px -12px rgba(20, 23, 53, 0.22);
+    transform-style: preserve-3d;
+    background: #ffffff;
+}
+
+.cardTopTitle {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    color: #1b2541;
+    font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+    font-weight: 700;
+    z-index: 6;
+    pointer-events: none;
+}
+
+.card>div {
+    position: absolute;
+    width: 50%;
+    min-width: 18.75rem;
+    height: 100%;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.content {
+    width: 100%;
+    padding: 1.8rem 2.2rem;
+    text-align: center;
+}
+
+.content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.content h3 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1b2541;
+}
+
+.socialIcons {
+    display: flex;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-bottom: 0.8rem;
+}
+
+.iconButton {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: 1.5px solid #e2e8f0;
+    background: #ffffff;
+    color: #555f6d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 150ms ease;
+    font-size: 0.95rem;
+}
+
+.iconButton:hover {
+    color: #f00a98;
+    border-color: #f00a98;
+    background: rgba(240, 10, 152, 0.05);
+    transform: translateY(-1px);
+}
+
+.loginWith {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+.loginWith::before,
+.loginWith::after {
+    content: "";
+    display: inline-block;
+    width: 20%;
+    height: 1px;
+    background: #e2e8f0;
+    vertical-align: middle;
+}
+
+.loginWith::before {
+    margin-right: 0.6rem;
+}
+
+.alertError {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 0.55rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.82rem;
+    margin-bottom: 0.6rem;
+    text-align: center;
+}
+
+.alertSuccess {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #16a34a;
+    padding: 0.55rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.82rem;
+    margin-bottom: 0.6rem;
+    text-align: center;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.inputRow {
+    display: flex;
+    gap: 0.6rem;
+    width: 100%;
+}
+
+.inputRow input {
+    flex: 1;
+    min-width: 0;
+}
+
+.form input[type="text"],
+.form input[type="email"],
+.form input[type="password"] {
+    border: 1.5px solid transparent;
+    padding: 0.85rem 1rem;
+    width: 100%;
+    font-size: 0.95rem;
+    background: #f1f3f6;
+    color: #1b2541;
+    border-radius: 0.5rem;
+    outline: none;
+    transition: all 180ms ease;
+}
+
+.form input[type="text"]::placeholder,
+.form input[type="email"]::placeholder,
+.form input[type="password"]::placeholder {
+    color: #8f9ba8;
+}
+
+.form input[type="text"]:focus,
+.form input[type="email"]:focus,
+.form input[type="password"]:focus {
+    background: #ffffff;
+    border-color: #f00a98;
+    box-shadow: 0 0 0 3px rgba(240, 10, 152, 0.15);
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+}
+
+.rememberLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.83rem;
+    color: #4d5662;
+    cursor: pointer;
+}
+
+.rememberLabel input {
+    accent-color: #f00a98;
+    cursor: pointer;
+}
+
+.linkButton {
+    background: none;
+    border: none;
+    color: #f00a98;
+    font-size: 0.83rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 150ms ease;
+}
+
+.linkButton:hover {
+    color: #d40884;
+    text-decoration: underline;
+}
+
+.primaryButton,
+.ghostButton {
+    margin-top: 0.8rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.75rem 1.4rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 180ms ease;
+    cursor: pointer;
+}
+
+.primaryButton {
+    width: 100%;
+    border: none;
+    background: #f00a98;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(240, 10, 152, 0.35);
+}
+
+.primaryButton:hover {
+    background: #d40884;
+    box-shadow: 0 6px 20px rgba(240, 10, 152, 0.48);
+    transform: translateY(-1px);
+}
+
+.ghostButton {
+    background: transparent;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.ghostButton:hover {
+    background: #ffffff;
+    color: #141735;
+    border-color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.primaryButton:active,
+.ghostButton:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.loginPanel {
+    left: 0;
+    background: #ffffff;
+    border-radius: 1.25rem 0 0 1.25rem;
+}
+
+.registerPanel {
+    right: 0;
+    z-index: 1;
+    border-radius: 0 1.25rem 1.25rem 0;
+    background: #ffffff;
+}
+
+.flipPage {
+    right: 0;
+    color: #fff;
+    border-radius: 0 1.25rem 1.25rem 0;
+    transform-origin: left center;
+    transition: animation 1s linear;
+}
+
+.flipPage p {
+    margin: 0.6rem auto 1.2rem;
+    font-size: 0.94rem;
+    color: rgba(255, 255, 255, 0.88);
+    line-height: 1.5;
+}
+
+.flipIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4.2rem;
+    height: 4.2rem;
+    border-radius: 999px;
+    border: 2px solid #fbbf24;
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    margin: 0 auto 1rem;
+    font-size: 1.8rem;
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.3);
+}
+
+.front {
+    background: linear-gradient(135deg, #141735 0%, #1b2541 55%, #2a164d 100%) no-repeat 0 0 / 200%;
+    z-index: 3;
+}
+
+.back {
+    background: linear-gradient(135deg, #2a164d 0%, #1b2541 45%, #141735 100%) no-repeat 0 0 / 200%;
+    z-index: 2;
+}
+
+.back .content {
+    transform: rotateY(180deg);
+}
+
+.active .front {
+    animation: rot-front 0.6s ease-in-out normal forwards;
+}
+
+.active .back {
+    animation: rot-back 0.6s ease-in-out normal forwards;
+}
+
+.close .front {
+    animation: close-rot-front 0.6s ease-in-out normal forwards;
+}
+
+.close .back {
+    animation: close-rot-back 0.6s ease-in-out normal forwards;
+}
+
+.active .registerPanel .content {
+    animation: show 0.7s ease-in-out normal forwards;
+}
+
+.close .registerPanel .content {
+    animation: hide 0.7s ease-in-out normal forwards;
+}
+
+.active .loginPanel .content {
+    animation: hide 0.7s ease-in-out normal forwards;
+}
+
+.close .loginPanel .content {
+    animation: show 0.7s ease-in-out normal forwards;
+}
+
+@keyframes rot-front {
+    from {
+        transform: translateZ(2px) rotateY(0deg);
+    }
+
+    to {
+        transform: translateZ(1px) rotateY(-180deg);
+    }
+}
+
+@keyframes close-rot-front {
+    from {
+        transform: translateZ(1px) rotateY(-180deg);
+    }
+
+    to {
+        transform: translateZ(2px) rotateY(0deg);
+    }
+}
+
+@keyframes rot-back {
+    from {
+        transform: translateZ(1px) rotateY(0deg);
+    }
+
+    to {
+        transform: translateZ(2px) rotateY(-180deg);
+    }
+}
+
+@keyframes close-rot-back {
+    from {
+        transform: translateZ(2px) rotateY(-180deg);
+    }
+
+    to {
+        transform: translateZ(1px) rotateY(0deg);
+    }
+}
+
+@keyframes show {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 0.99;
+        transform: scale(0.99);
+    }
+}
+
+@keyframes hide {
+    from {
+        opacity: 0.99;
+        transform: scale(0.99);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 1100px) {
+    .page {
+        grid-template-columns: 1fr;
+    }
+
+    .imageSection {
+        min-height: auto;
+        padding: 2rem 1.5rem 0.5rem;
+    }
+
+    .image {
+        max-width: 28rem;
+        max-height: 40vh;
+    }
+
+    .formSide {
+        padding-block: 2rem 2.5rem;
+    }
+}
+
+@media (max-width: 720px) {
+    .formSide {
+        padding: 1rem;
+    }
+
+    .card {
+        width: 100%;
+        min-height: 44rem;
+        height: auto;
+        display: grid;
+        grid-template-columns: 1fr;
+        overflow: hidden;
+    }
+
+    .card>div {
+        position: relative;
+        width: 100%;
+        min-width: 0;
+        border-radius: 0;
+        height: auto;
+    }
+
+    .loginPanel,
+    .registerPanel,
+    .flipPage {
+        left: 0;
+        right: 0;
+    }
+
+    .flipPage {
+        transform-origin: center;
+        min-height: 12.5rem;
+    }
+
+    .back .content {
+        transform: none;
+    }
+
+    .active .front,
+    .active .back,
+    .close .front,
+    .close .back {
+        animation: none;
+    }
+
+    .active .loginPanel .content,
+    .close .registerPanel .content {
+        display: none;
+        animation: none;
+    }
+
+    .active .registerPanel .content,
+    .close .loginPanel .content {
+        display: block;
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}

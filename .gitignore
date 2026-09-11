@@ -1,0 +1,21 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Python
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+.env
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

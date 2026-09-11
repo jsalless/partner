@@ -8,6 +8,8 @@ import {
     FiArrowRightCircle,
     FiLogIn,
     FiUserPlus,
+    FiEye,
+    FiEyeOff,
 } from "react-icons/fi";
 import { FaGoogle, FaGithub } from "react-icons/fa6";
 import styles from "./page.module.css";
@@ -21,6 +23,7 @@ export default function LoginPage() {
     // Login state
     const [loginEmail, setLoginEmail] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
+    const [showLoginPassword, setShowLoginPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
 
     // Register state
@@ -28,7 +31,9 @@ export default function LoginPage() {
     const [registerLastName, setRegisterLastName] = useState("");
     const [registerEmail, setRegisterEmail] = useState("");
     const [registerPassword, setRegisterPassword] = useState("");
+    const [showRegisterPassword, setShowRegisterPassword] = useState(false);
     const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
+    const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false);
 
     // Feedback state
     const [loading, setLoading] = useState(false);
@@ -186,14 +191,24 @@ export default function LoginPage() {
                                     value={loginEmail}
                                     onChange={(e) => setLoginEmail(e.target.value)}
                                 />
-                                <input
-                                    type="password"
-                                    placeholder="Senha"
-                                    autoComplete="current-password"
-                                    required
-                                    value={loginPassword}
-                                    onChange={(e) => setLoginPassword(e.target.value)}
-                                />
+                                <div className={styles.passwordContainer}>
+                                    <input
+                                        type={showLoginPassword ? "text" : "password"}
+                                        placeholder="Senha"
+                                        autoComplete="current-password"
+                                        required
+                                        value={loginPassword}
+                                        onChange={(e) => setLoginPassword(e.target.value)}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={styles.passwordToggle}
+                                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                                        aria-label={showLoginPassword ? "Ocultar senha" : "Mostrar senha"}
+                                    >
+                                        {showLoginPassword ? <FiEyeOff /> : <FiEye />}
+                                    </button>
+                                </div>
                                 <div className={styles.row}>
                                     <label className={styles.rememberLabel}>
                                         <input
@@ -269,24 +284,44 @@ export default function LoginPage() {
                                     value={registerEmail}
                                     onChange={(e) => setRegisterEmail(e.target.value)}
                                 />
-                                <input
-                                    type="password"
-                                    placeholder="Senha (mínimo 6 caracteres)"
-                                    autoComplete="new-password"
-                                    required
-                                    minLength={6}
-                                    value={registerPassword}
-                                    onChange={(e) => setRegisterPassword(e.target.value)}
-                                />
-                                <input
-                                    type="password"
-                                    placeholder="Confirmar senha"
-                                    autoComplete="new-password"
-                                    required
-                                    minLength={6}
-                                    value={registerConfirmPassword}
-                                    onChange={(e) => setRegisterConfirmPassword(e.target.value)}
-                                />
+                                <div className={styles.passwordContainer}>
+                                    <input
+                                        type={showRegisterPassword ? "text" : "password"}
+                                        placeholder="Senha (mínimo 6 caracteres)"
+                                        autoComplete="new-password"
+                                        required
+                                        minLength={6}
+                                        value={registerPassword}
+                                        onChange={(e) => setRegisterPassword(e.target.value)}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={styles.passwordToggle}
+                                        onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                                        aria-label={showRegisterPassword ? "Ocultar senha" : "Mostrar senha"}
+                                    >
+                                        {showRegisterPassword ? <FiEyeOff /> : <FiEye />}
+                                    </button>
+                                </div>
+                                <div className={styles.passwordContainer}>
+                                    <input
+                                        type={showRegisterConfirmPassword ? "text" : "password"}
+                                        placeholder="Confirmar senha"
+                                        autoComplete="new-password"
+                                        required
+                                        minLength={6}
+                                        value={registerConfirmPassword}
+                                        onChange={(e) => setRegisterConfirmPassword(e.target.value)}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={styles.passwordToggle}
+                                        onClick={() => setShowRegisterConfirmPassword(!showRegisterConfirmPassword)}
+                                        aria-label={showRegisterConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
+                                    >
+                                        {showRegisterConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                                    </button>
+                                </div>
                                 <button
                                     type="submit"
                                     className={styles.primaryButton}

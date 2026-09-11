@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import { League_Gothic } from "next/font/google";
+import { useState } from "react";
 
 const leagueGothic = League_Gothic({
   subsets: ["latin"],
@@ -7,6 +10,8 @@ const leagueGothic = League_Gothic({
 });
 
 export default function Equipes() {
+  const [activeTab, setActiveTab] = useState<"minhas" | "explorar">("minhas");
+
   return (
     <div className="w-full min-h-full flex flex-col relative overflow-hidden">
       {/* Banner */}
@@ -34,7 +39,28 @@ export default function Equipes() {
       </div>
 
       {/* Main Content Area */}
-      <div className="p-12 flex-1 w-full">
+      <div className="p-12 flex-1 w-full max-w-7xl mx-auto flex flex-col items-center">
+        {/* Actions */}
+        <div className="flex gap-4 bg-white p-1.5 rounded-full shadow-lg mt-[10px] z-30 relative border border-gray-100">
+          <button
+            onClick={() => setActiveTab("minhas")}
+            className={`px-8 py-2.5 rounded-full font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === "minhas"
+              ? "bg-[#f00a98] text-white shadow-md"
+              : "text-gray-500 hover:text-[#141735]"
+              }`}
+          >
+            Minhas Equipes
+          </button>
+          <button
+            onClick={() => setActiveTab("explorar")}
+            className={`px-8 py-2.5 rounded-full font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === "explorar"
+              ? "bg-[#f00a98] text-white shadow-md"
+              : "text-gray-500 hover:text-[#141735]"
+              }`}
+          >
+            Explorar
+          </button>
+        </div>
         {/* Future content goes here */}
       </div>
     </div>

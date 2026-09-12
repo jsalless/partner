@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import { Navbar } from "@/components/navbar";
+import { ToastProvider } from "@/components/toastProvider";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -25,11 +26,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex bg-[#FDFBFA] text-zinc-900">
+      <body className="min-h-screen flex bg-[#FDFBFA] text-zinc-900 overflow-x-hidden">
         <Navbar />
-        <main className="flex-1 overflow-y-auto min-h-screen">
+        <main className="flex-1 min-w-0 min-h-screen overflow-y-auto">
           {children}
         </main>
+        <ToastProvider />
       </body>
     </html>
   );

@@ -14,6 +14,7 @@ import {
   FiEye,
   FiEyeOff,
 } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 const DEFAULT_AVATARS = [
   "/Avatar1.svg",
@@ -32,11 +33,13 @@ interface EditProfileModalProps {
   initialLastName: string;
   initialEmail: string;
   initialAvatarUrl: string;
+  initialDefaultAvatar?: string | null;
   onSave: (data: {
     firstName: string;
     lastName: string;
     email: string;
     avatarUrl: string;
+    defaultAvatar?: string;
     password?: string;
   }) => Promise<void> | void;
   onDeleteAccount?: () => Promise<void> | void;
@@ -50,6 +53,7 @@ export function EditProfileModal({
   initialLastName,
   initialEmail,
   initialAvatarUrl,
+  initialDefaultAvatar,
   onSave,
   onDeleteAccount,
 }: EditProfileModalProps) {
@@ -64,6 +68,10 @@ export function EditProfileModal({
   const [showPassword, setShowPassword] = useState(false);
 
   // Estados de foto/avatar
+  const [defaultAvatar, setDefaultAvatar] = useState(
+    initialDefaultAvatar ||
+      (initialAvatarUrl?.toLowerCase().includes(".svg") ? initialAvatarUrl : "/Avatar1.svg")
+  );
   const [selectedAvatar, setSelectedAvatar] = useState(initialAvatarUrl || "/Avatar1.svg");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
@@ -90,16 +98,23 @@ export function EditProfileModal({
       setErrorMessage(null);
       setSavedSuccess(false);
 
-      if (initialAvatarUrl?.startsWith("data:image")) {
+      const resolvedDefault =
+        initialDefaultAvatar ||
+        (initialAvatarUrl?.toLowerCase().includes(".svg") ? initialAvatarUrl : "/Avatar1.svg");
+      setDefaultAvatar(resolvedDefault);
+
+      if (initialAvatarUrl?.startsWith("data:image") || initialAvatarUrl?.startsWith("http")) {
         setUploadedImage(initialAvatarUrl);
         setSelectedAvatar(initialAvatarUrl);
       } else {
-        setSelectedAvatar(initialAvatarUrl || "/Avatar1.svg");
+        const preset = initialAvatarUrl || resolvedDefault || "/Avatar1.svg";
+        setSelectedAvatar(preset);
+        setDefaultAvatar(preset);
         setUploadedImage(null);
       }
       setFileName("");
     }
-  }, [isOpen, initialFirstName, initialLastName, initialEmail, initialAvatarUrl]);
+  }, [isOpen, initialFirstName, initialLastName, initialEmail, initialAvatarUrl, initialDefaultAvatar]);
 
   // Fecha modal com tecla ESC (se não estiver excluindo)
   useEffect(() => {
@@ -119,6 +134,7 @@ export function EditProfileModal({
   const currentPreview = uploadedImage || selectedAvatar;
 
   const handleSelectPresetAvatar = (avatarPath: string) => {
+    setDefaultAvatar(avatarPath);
     setSelectedAvatar(avatarPath);
     setUploadedImage(null);
     setFileName("");
@@ -132,12 +148,16 @@ export function EditProfileModal({
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setErrorMessage("Selecione um arquivo de imagem válido (PNG, JPG, WebP, SVG).");
+      const msg = "Selecione um arquivo de imagem válido (PNG, JPG, WebP, SVG).";
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
     if (file.size > 4 * 1024 * 1024) {
-      setErrorMessage("A imagem selecionada deve ter no máximo 4MB.");
+      const msg = "A imagem selecionada deve ter no máximo 4MB.";
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
@@ -158,7 +178,7 @@ export function EditProfileModal({
   const handleRemoveUploadedImage = () => {
     setUploadedImage(null);
     setFileName("");
-    setSelectedAvatar("/Avatar1.svg");
+    setSelectedAvatar(defaultAvatar || "/Avatar1.svg");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -183,7 +203,7 @@ export function EditProfileModal({
     setLoading(true);
 
     try {
-      const finalAvatar = uploadedImage || selectedAvatar;
+      const finalAvatar = uploadedImage || selectedAvatar || defaultAvatar || "/Avatar1.svg";
 
       // Chama a função onSave passada pelo componente pai
       await onSave({
@@ -191,6 +211,7 @@ export function EditProfileModal({
         lastName: lastName.trim(),
         email: email.trim(),
         avatarUrl: finalAvatar,
+        defaultAvatar: defaultAvatar,
         password: newPassword ? newPassword : undefined,
       });
 
@@ -201,6 +222,7 @@ export function EditProfileModal({
           last_name: lastName.trim(),
           email: email.trim(),
           avatar_url: finalAvatar,
+          default_avatar: defaultAvatar,
         };
         if (newPassword) {
           payload.password = newPassword;
@@ -219,12 +241,15 @@ export function EditProfileModal({
       }
 
       setSavedSuccess(true);
+      toast.success("Perfil atualizado com sucesso!");
       setTimeout(() => {
         setSavedSuccess(false);
         onClose();
       }, 700);
     } catch (err: any) {
-      setErrorMessage(err.message || "Falha ao atualizar perfil.");
+      const msg = err.message || "Falha ao atualizar perfil.";
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -255,10 +280,13 @@ export function EditProfileModal({
       sessionStorage.removeItem("partner_token");
       sessionStorage.removeItem("partner_user");
 
+      toast.info("Conta excluída com sucesso.");
       onClose();
       router.push("/login");
     } catch (err: any) {
-      setErrorMessage(err.message || "Não foi possível excluir a conta.");
+      const msg = err.message || "Não foi possível excluir a conta.";
+      setErrorMessage(msg);
+      toast.error(msg);
       setDeleting(false);
     }
   };
@@ -378,17 +406,18 @@ export function EditProfileModal({
               </span>
               <div className="flex items-center gap-2">
                 {DEFAULT_AVATARS.map((avatarPath, index) => {
+                  const isCurrentDefault =
+                    defaultAvatar.toLowerCase() === avatarPath.toLowerCase();
                   const isSelected =
-                    !uploadedImage &&
-                    (selectedAvatar === avatarPath ||
-                      selectedAvatar.toLowerCase() === avatarPath.toLowerCase());
+                    (!uploadedImage && selectedAvatar.toLowerCase() === avatarPath.toLowerCase()) ||
+                    isCurrentDefault;
                   return (
                     <button
                       key={avatarPath}
                       type="button"
                       onClick={() => handleSelectPresetAvatar(avatarPath)}
-                      title={`Avatar ${index + 1}`}
-                      className={`w-9 h-9 rounded-full overflow-hidden border-2 transition-all cursor-pointer p-0.5 ${
+                      title={`Avatar ${index + 1}${isCurrentDefault ? " (Padrão ativo)" : ""}`}
+                      className={`w-9 h-9 rounded-full overflow-hidden border-2 transition-all cursor-pointer p-0.5 relative ${
                         isSelected
                           ? "border-[#ea384c] scale-110 shadow-md shadow-[#ea384c]/30 ring-2 ring-[#ea384c]/20"
                           : "border-zinc-700/80 hover:border-zinc-500 opacity-60 hover:opacity-100"

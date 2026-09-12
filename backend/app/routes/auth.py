@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from fastapi import APIRouter, HTTPException, Depends, Header, status
 from typing import Optional
@@ -13,6 +14,30 @@ from app.schemas.auth import (
 logger = logging.getLogger("uvicorn")
 
 router = APIRouter(prefix="/api/auth", tags=["Autenticação"])
+
+async def _execute_auth_call(fn):
+    """Executa uma chamada síncrona ao Supabase Auth com timeout e retry automático contra quedas de TLS/SSL."""
+    try:
+        return await asyncio.to_thread(fn, get_supabase_client())
+    except Exception as e:
+        err_msg = str(e)
+        if any(keyword in err_msg for keyword in ["EOF occurred", "SSLError", "connection", "Connection reset", "broken pipe", "RemoteDisconnected"]):
+            logger.warning(f"Falha de conexão/SSL com Supabase ({err_msg}). Reiniciando cliente e tentando novamente...")
+            get_supabase_client(fresh=True)
+            return await asyncio.to_thread(fn, get_supabase_client())
+        raise
+
+async def _execute_admin_call(fn):
+    """Executa uma chamada síncrona ao Supabase Admin com timeout e retry automático contra quedas de TLS/SSL."""
+    try:
+        return await asyncio.to_thread(fn, get_supabase_admin_client())
+    except Exception as e:
+        err_msg = str(e)
+        if any(keyword in err_msg for keyword in ["EOF occurred", "SSLError", "connection", "Connection reset", "broken pipe", "RemoteDisconnected"]):
+            logger.warning(f"Falha de conexão/SSL com Supabase Admin ({err_msg}). Reiniciando cliente e tentando novamente...")
+            get_supabase_admin_client(fresh=True)
+            return await asyncio.to_thread(fn, get_supabase_admin_client())
+        raise
 
 def get_current_token(authorization: Optional[str] = Header(None)) -> str:
     """Extrai e valida o token Bearer do cabeçalho de autorização."""
@@ -58,9 +83,6 @@ async def register(data: RegisterRequest):
 
     full_name = f"{first_name} {last_name}".strip() if last_name else first_name
 
-    admin_client = get_supabase_admin_client()
-    client = get_supabase_client()
-
     try:
         # Cria o usuário via Admin para auto-confirmar o e-mail no Supabase Auth
         user_attributes = {
@@ -70,14 +92,19 @@ async def register(data: RegisterRequest):
             "user_metadata": {
                 "first_name": first_name,
                 "last_name": last_name,
-                "full_name": full_name
+                "full_name": full_name,
+                "avatar_url": "/Avatar1.svg",
+                "default_avatar": "/Avatar1.svg"
             },
             "app_metadata": {
                 "role": "cliente"
             }
         }
         
-        created_user_res = admin_client.auth.admin.create_user(user_attributes)
+        def _do_create(adm):
+            return adm.auth.admin.create_user(user_attributes)
+
+        created_user_res = await _execute_admin_call(_do_create)
         user = created_user_res.user
 
         # Salva o usuário na tabela 'users' do banco PostgreSQL via Prisma
@@ -91,7 +118,9 @@ async def register(data: RegisterRequest):
                             "email": data.email,
                             "firstName": first_name,
                             "lastName": last_name or "",
-                            "role": "cliente"
+                            "role": "cliente",
+                            "avatarUrl": "/Avatar1.svg",
+                            "defaultAvatar": "/Avatar1.svg"
                         },
                         "update": {
                             "firstName": first_name,
@@ -107,10 +136,12 @@ async def register(data: RegisterRequest):
         access_token = None
         refresh_token = None
         try:
-            sign_in_res = client.auth.sign_in_with_password({
-                "email": data.email,
-                "password": data.password
-            })
+            def _do_signin(c):
+                return c.auth.sign_in_with_password({
+                    "email": data.email,
+                    "password": data.password
+                })
+            sign_in_res = await _execute_auth_call(_do_signin)
             if sign_in_res.session:
                 access_token = sign_in_res.session.access_token
                 refresh_token = sign_in_res.session.refresh_token
@@ -129,6 +160,8 @@ async def register(data: RegisterRequest):
                 last_name=last_name,
                 full_name=full_name,
                 role=role,
+                avatar_url="/Avatar1.svg",
+                default_avatar="/Avatar1.svg",
                 created_at=str(user.created_at) if hasattr(user, "created_at") else None,
                 user_metadata=user.user_metadata,
                 app_metadata=user.app_metadata
@@ -153,13 +186,14 @@ async def login(data: LoginRequest):
     """
     Autentica o usuário com email e senha no Supabase Auth.
     """
-    client = get_supabase_client()
-
     try:
-        res = client.auth.sign_in_with_password({
-            "email": data.email,
-            "password": data.password
-        })
+        def _do_login(c):
+            return c.auth.sign_in_with_password({
+                "email": data.email,
+                "password": data.password
+            })
+
+        res = await _execute_auth_call(_do_login)
 
         if not res.session or not res.user:
             raise HTTPException(
@@ -168,8 +202,13 @@ async def login(data: LoginRequest):
             )
 
         user = res.user
-        full_name = (user.user_metadata or {}).get("full_name")
+        meta = user.user_metadata or {}
+        first_name = meta.get("first_name")
+        last_name = meta.get("last_name")
+        full_name = meta.get("full_name") or (f"{first_name} {last_name}".strip() if (first_name or last_name) else None)
         role = (user.app_metadata or {}).get("role", "cliente")
+        default_avatar = meta.get("default_avatar") or "/Avatar1.svg"
+        avatar_url = meta.get("avatar_url") or meta.get("picture") or meta.get("avatar") or default_avatar
 
         return AuthResponse(
             access_token=res.session.access_token,
@@ -177,8 +216,12 @@ async def login(data: LoginRequest):
             user=UserResponse(
                 id=user.id,
                 email=user.email or data.email,
+                first_name=first_name,
+                last_name=last_name,
                 full_name=full_name,
                 role=role,
+                avatar_url=avatar_url,
+                default_avatar=default_avatar,
                 created_at=str(user.created_at) if hasattr(user, "created_at") else None,
                 user_metadata=user.user_metadata,
                 app_metadata=user.app_metadata
@@ -190,7 +233,8 @@ async def login(data: LoginRequest):
         raise
     except Exception as e:
         error_msg = str(e)
-        if "Invalid login credentials" in error_msg:
+        logger.error(f"Erro ao efetuar login para {data.email}: {error_msg}")
+        if "Invalid login credentials" in error_msg or "invalid_credentials" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="E-mail ou senha incorretos."
@@ -205,10 +249,11 @@ async def get_current_user(token: str = Depends(get_current_token)):
     """
     Retorna os dados do usuário autenticado validando o token JWT no Supabase Auth.
     """
-    client = get_supabase_client()
-
     try:
-        user_res = client.auth.get_user(token)
+        def _do_get_user(c):
+            return c.auth.get_user(token)
+
+        user_res = await _execute_auth_call(_do_get_user)
         user = user_res.user
         if not user:
             raise HTTPException(
@@ -216,14 +261,23 @@ async def get_current_user(token: str = Depends(get_current_token)):
                 detail="Sessão expirada ou inválida."
             )
 
-        full_name = (user.user_metadata or {}).get("full_name")
+        meta = user.user_metadata or {}
+        first_name = meta.get("first_name")
+        last_name = meta.get("last_name")
+        full_name = meta.get("full_name") or (f"{first_name} {last_name}".strip() if (first_name or last_name) else None)
         role = (user.app_metadata or {}).get("role", "cliente")
+        default_avatar = meta.get("default_avatar") or "/Avatar1.svg"
+        avatar_url = meta.get("avatar_url") or meta.get("picture") or meta.get("avatar") or default_avatar
 
         return UserResponse(
             id=user.id,
             email=user.email or "",
+            first_name=first_name,
+            last_name=last_name,
             full_name=full_name,
             role=role,
+            avatar_url=avatar_url,
+            default_avatar=default_avatar,
             created_at=str(user.created_at) if hasattr(user, "created_at") else None,
             user_metadata=user.user_metadata,
             app_metadata=user.app_metadata
@@ -242,9 +296,10 @@ async def logout(token: str = Depends(get_current_token)):
     """
     Encerra a sessão ativa do usuário no Supabase.
     """
-    client = get_supabase_client()
     try:
-        client.auth.sign_out(token)
+        def _do_sign_out(c):
+            return c.auth.sign_out(token)
+        await _execute_auth_call(_do_sign_out)
         return MessageResponse(message="Sessão encerrada com sucesso.")
     except Exception as e:
         return MessageResponse(message="Logout concluído.", success=True)
@@ -254,10 +309,10 @@ async def health_check():
     """
     Verifica a saúde da API e a conectividade com o Supabase.
     """
-    admin_client = get_supabase_admin_client()
     try:
-        # Testa chamada leve de verificação
-        users = admin_client.auth.admin.list_users()
+        def _check_admin(adm):
+            return adm.auth.admin.list_users()
+        users = await _execute_admin_call(_check_admin)
         return {
             "status": "healthy",
             "supabase_connection": "connected",

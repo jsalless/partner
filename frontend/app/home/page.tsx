@@ -4,11 +4,14 @@ import { useState, useEffect } from "react";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import Image from "next/image";
 import Link from "next/link";
+import { NotificationsModal } from "@/components/notificationsModal";
 
 export default function Home() {
     const [userName, setUserName] = useState("Johnn");
-    const [avatarUrl, setAvatarUrl] = useState("/avatar1.svg");
+    const [avatarUrl, setAvatarUrl] = useState("/Avatar1.svg");
     const [userId, setUserId] = useState<string>("");
+    const [unreadCount, setUnreadCount] = useState<number>(0);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
     useEffect(() => {
         try {
@@ -23,23 +26,57 @@ export default function Home() {
 
                 const photo =
                     user.avatar_url ||
+                    user.default_avatar ||
                     user.avatar ||
                     user.photo_url ||
                     user.picture ||
                     user.user_metadata?.avatar_url ||
+                    user.user_metadata?.default_avatar ||
                     user.user_metadata?.picture ||
-                    user.user_metadata?.avatar;
+                    user.user_metadata?.avatar ||
+                    "/Avatar1.svg";
 
-                if (photo) {
-                    setAvatarUrl(photo);
-                } else {
-                    setAvatarUrl("/avatar1.svg");
-                }
+                setAvatarUrl(photo);
+                fetchUnreadCount(user.id);
             }
         } catch {
             // Mantém os padrões em caso de falha de leitura
         }
     }, []);
+
+    const fetchUnreadCount = async (uid?: string) => {
+        const targetId = uid || userId;
+        if (!targetId) return;
+        try {
+            const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const token =
+                typeof window !== "undefined"
+                    ? localStorage.getItem("partner_token") || sessionStorage.getItem("partner_token")
+                    : null;
+            const headers: Record<string, string> = {};
+            if (token) headers["Authorization"] = `Bearer ${token}`;
+
+            const res = await fetch(`${API_BASE_URL}/api/notifications/unread-count?user_id=${targetId}`, {
+                headers
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setUnreadCount(data.unread_count ?? 0);
+            }
+        } catch {
+            // Silencioso para não poluir UI
+        }
+    };
+
+    // Polling leve para sincronizar o contador de notificações
+    useEffect(() => {
+        if (!userId) return;
+        fetchUnreadCount(userId);
+        const interval = setInterval(() => {
+            fetchUnreadCount(userId);
+        }, 12000);
+        return () => clearInterval(interval);
+    }, [userId]);
 
     return (
         <div className="p-10 w-full h-full">
@@ -47,12 +84,20 @@ export default function Home() {
             <header className="flex justify-between items-center mb-12">
                 <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">Bom dia, {userName}!</h1>
                 <div className="flex items-center space-x-6">
-                    <div className="relative cursor-pointer p-2 rounded-full hover:bg-zinc-100 transition-colors flex items-center justify-center">
-                        <IoMdNotificationsOutline size={38} className="text-zinc-800" />
-                        <span className="absolute top-0.5 right-0.5 min-w-[1.25rem] h-5 px-1 bg-red-500 rounded-full border-2 border-[#f5f5f5] text-[10px] font-bold text-white flex items-center justify-center shadow-sm">
-                            3
-                        </span>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setIsNotificationsOpen(true)}
+                        className="relative cursor-pointer p-2 rounded-full hover:bg-zinc-100 transition-colors flex items-center justify-center border-none bg-transparent"
+                        title="Ver notificações"
+                        aria-label="Notificações"
+                    >
+                        <IoMdNotificationsOutline size={38} className="text-zinc-800 hover:text-zinc-950 transition-colors" />
+                        {unreadCount > 0 && (
+                            <span className="absolute top-0.5 right-0.5 min-w-[1.25rem] h-5 px-1.5 bg-red-500 rounded-full border-2 border-[#f5f5f5] text-[10px] font-bold text-white flex items-center justify-center shadow-sm animate-in zoom-in duration-200">
+                                {unreadCount > 99 ? "99+" : unreadCount}
+                            </span>
+                        )}
+                    </button>
                     <Link
                         href={userId ? `/perfil/${userId}` : "/perfil"}
                         title="Ver meu perfil"
@@ -62,7 +107,7 @@ export default function Home() {
                             src={avatarUrl}
                             alt="Foto do Usuário"
                             className="w-full h-full object-cover"
-                            onError={() => setAvatarUrl("/avatar1.svg")}
+                            onError={() => setAvatarUrl("/Avatar1.svg")}
                         />
                     </Link>
                 </div>
@@ -179,6 +224,14 @@ export default function Home() {
                 </div>
 
             </div>
+
+            {/* Modal de Notificações */}
+            <NotificationsModal
+                isOpen={isNotificationsOpen}
+                onClose={() => setIsNotificationsOpen(false)}
+                userId={userId}
+                onUnreadCountChange={(count) => setUnreadCount(count)}
+            />
         </div>
     );
 }

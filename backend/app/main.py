@@ -5,6 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import ALLOWED_ORIGINS, BACKEND_PORT
 from app.routes.auth import router as auth_router
 from app.routes.users import router as users_router
+from app.routes.teams import router as teams_router
+from app.routes.projects import router as projects_router
+from app.routes.notifications import router as notifications_router
 from app.database import connect_prisma, disconnect_prisma
 
 logger = logging.getLogger("uvicorn")
@@ -49,9 +52,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Inclusão dos roteadores
+# Inclusão dos roteadores principais da API
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(teams_router)
+app.include_router(projects_router)
+app.include_router(notifications_router)
 
 @app.get("/", tags=["Geral"])
 async def root():

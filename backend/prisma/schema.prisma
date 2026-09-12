@@ -14,15 +14,20 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  firstName String   @map("first_name")
-  lastName  String   @map("last_name")
-  role      String   @default("cliente")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  email       String   @unique
+  firstName   String   @map("first_name")
+  lastName    String   @map("last_name")
+  role          String   @default("cliente")
+  avatarUrl     String?  @default("/Avatar1.svg") @map("avatar_url")
+  defaultAvatar String?  @default("/Avatar1.svg") @map("default_avatar")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  teams     Team[]   @relation("TeamMembers")
+  ownedTeams    Team[]        @relation("TeamOwner")
+  teams         Team[]        @relation("TeamMembers")
+  messages      TeamMessage[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -40,15 +45,72 @@ model Project {
 }
 
 model Team {
-  id          String   @id @default(uuid())
+  id          String        @id @default(uuid())
   name        String
   description String?
-  projectId   String?  @map("project_id")
+  ownerId     String        @map("owner_id")
+  projectId   String        @map("project_id")
+  isPrivate   Boolean       @default(false) @map("is_private")
+  avatarUrl   String?       @map("avatar_url")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  owner       User          @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  members     User[]        @relation("TeamMembers")
+  messages    TeamMessage[]
+  channels    TeamChannel[]
+
+  @@map("teams")
+}
+
+model TeamChannel {
+  id          String   @id @default(uuid())
+  teamId      String   @map("team_id")
+  name        String
+  description String?
+  isDefault   Boolean  @default(false) @map("is_default")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  project     Project  @relation(fields: [projectId], references: [id])
-  members     User[]   @relation("TeamMembers")
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  @@map("teams")
+  @@unique([teamId, name])
+  @@index([teamId])
+  @@map("team_channels")
+}
+
+model TeamMessage {
+  id        String   @id @default(uuid())
+  teamId    String   @map("team_id")
+  userId    String   @map("user_id")
+  content   String
+  type      String   @default("chat")
+  channel   String   @default("geral")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([teamId, channel, createdAt])
+  @@map("team_messages")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  message   String
+  type      String   @default("team_message")
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

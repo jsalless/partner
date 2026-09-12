@@ -12,6 +12,7 @@ import {
     FiEyeOff,
 } from "react-icons/fi";
 import { FaGoogle, FaGithub } from "react-icons/fa6";
+import { toast } from "react-toastify";
 import styles from "./page.module.css";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -76,12 +77,16 @@ export default function LoginPage() {
                 }
             }
 
-            setSuccessMsg("Login realizado com sucesso! Redirecionando...");
+            const welcomeMsg = "Login realizado com sucesso! Redirecionando...";
+            setSuccessMsg(welcomeMsg);
+            toast.success(welcomeMsg);
             setTimeout(() => {
                 router.push("/home");
             }, 800);
         } catch (err: any) {
-            setErrorMsg(err.message || "Falha na comunicação com o servidor.");
+            const msg = err.message || "Falha na comunicação com o servidor.";
+            setErrorMsg(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
@@ -92,7 +97,9 @@ export default function LoginPage() {
         clearMessages();
 
         if (registerPassword !== registerConfirmPassword) {
-            setErrorMsg("As senhas não coincidem. Por favor, verifique.");
+            const msg = "As senhas não coincidem. Por favor, verifique.";
+            setErrorMsg(msg);
+            toast.error(msg);
             return;
         }
 
@@ -117,7 +124,9 @@ export default function LoginPage() {
                 throw new Error(data.detail || "Erro ao criar conta.");
             }
 
-            setSuccessMsg("Conta criada com sucesso! Você já pode fazer login.");
+            const createdMsg = "Conta criada com sucesso! Você já pode fazer login.";
+            setSuccessMsg(createdMsg);
+            toast.success(createdMsg);
             // Se veio token direto, podemos armazenar
             if (data.access_token) {
                 localStorage.setItem("partner_token", data.access_token);
@@ -130,11 +139,12 @@ export default function LoginPage() {
                 setTimeout(() => {
                     setIsRegister(false);
                     clearMessages();
-                    setLoginEmail(registerEmail);
                 }, 1500);
             }
         } catch (err: any) {
-            setErrorMsg(err.message || "Falha ao registrar usuário.");
+            const msg = err.message || "Erro ao criar conta.";
+            setErrorMsg(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }

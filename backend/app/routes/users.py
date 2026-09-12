@@ -116,6 +116,8 @@ async def list_users():
             last_name = meta.get("last_name")
             full_name = meta.get("full_name") or (f"{first_name} {last_name}".strip() if (first_name or last_name) else None)
             role = (u.app_metadata or {}).get("role", "cliente")
+            default_avatar = meta.get("default_avatar") or "/Avatar1.svg"
+            avatar_url = meta.get("avatar_url") or meta.get("picture") or meta.get("avatar") or default_avatar
             result.append(UserResponse(
                 id=u.id,
                 email=u.email or "",
@@ -123,6 +125,8 @@ async def list_users():
                 last_name=last_name,
                 full_name=full_name,
                 role=role,
+                avatar_url=avatar_url,
+                default_avatar=default_avatar,
                 created_at=str(u.created_at) if hasattr(u, "created_at") else None,
                 user_metadata=u.user_metadata,
                 app_metadata=u.app_metadata
@@ -171,7 +175,17 @@ async def get_user_by_id(user_id: str):
     full_name = meta.get("full_name") or (f"{first_name} {last_name}".strip() if (first_name or last_name) else None)
     email = (db_user.email if db_user else None) or (auth_user.email if auth_user else "")
     role = (db_user.role if db_user else None) or ((auth_user.app_metadata or {}).get("role") if auth_user else "cliente")
-    avatar_url = meta.get("avatar_url") or meta.get("picture")
+    default_avatar = (
+        (getattr(db_user, "defaultAvatar", None) if db_user else None) or
+        meta.get("default_avatar") or
+        "/Avatar1.svg"
+    )
+    avatar_url = (
+        meta.get("avatar_url") or
+        meta.get("picture") or
+        (getattr(db_user, "avatarUrl", None) if db_user else None) or
+        default_avatar
+    )
     final_id = db_user.id if db_user else (auth_user.id if auth_user else user_id)
     created_at = str(db_user.createdAt) if db_user else (str(auth_user.created_at) if auth_user and hasattr(auth_user, "created_at") else None)
 
@@ -182,6 +196,7 @@ async def get_user_by_id(user_id: str):
         last_name=last_name,
         full_name=full_name,
         avatar_url=avatar_url,
+        default_avatar=default_avatar,
         role=role or "cliente",
         created_at=created_at,
         user_metadata=meta,
@@ -192,7 +207,7 @@ async def get_user_by_id(user_id: str):
 @router.put("/{user_id}", response_model=UserResponse)
 async def update_user(user_id: str, data: UserUpdateRequest):
     """
-    Atualiza informações do usuário (nome, sobrenome, email, senha, foto de perfil) no Supabase Auth e no Prisma.
+    Atualiza informações do usuário (nome, sobrenome, email, senha, foto de perfil, avatar default) no Supabase Auth e no Prisma.
     """
     admin_client = get_supabase_admin_client()
 
@@ -226,8 +241,20 @@ async def update_user(user_id: str, data: UserUpdateRequest):
         fn = updated_meta.get("first_name", "")
         ln = updated_meta.get("last_name", "")
         updated_meta["full_name"] = f"{fn} {ln}".strip()
+
+    if data.default_avatar is not None:
+        updated_meta["default_avatar"] = data.default_avatar
+
     if data.avatar_url is not None:
+        # Se for um avatar SVG pré-definido, salva como default_avatar também
+        if data.avatar_url.lower().startswith("/avatar") and data.avatar_url.lower().endswith(".svg"):
+            updated_meta["default_avatar"] = data.avatar_url
         updated_meta["avatar_url"] = data.avatar_url
+    elif data.default_avatar is not None:
+        # Se avatar_url não foi passado mas default_avatar mudou e usuário não tem upload personalizado
+        curr_avatar = updated_meta.get("avatar_url", "")
+        if not curr_avatar or (curr_avatar.lower().startswith("/avatar") and curr_avatar.lower().endswith(".svg")):
+            updated_meta["avatar_url"] = data.default_avatar
 
     if updated_meta:
         auth_attrs["user_metadata"] = updated_meta
@@ -248,6 +275,13 @@ async def update_user(user_id: str, data: UserUpdateRequest):
             prisma_data["lastName"] = data.last_name
         if data.email:
             prisma_data["email"] = data.email
+        if data.avatar_url is not None:
+            prisma_data["avatarUrl"] = data.avatar_url
+        if data.default_avatar is not None:
+            prisma_data["defaultAvatar"] = data.default_avatar
+        elif data.avatar_url is not None and data.avatar_url.lower().startswith("/avatar") and data.avatar_url.lower().endswith(".svg"):
+            prisma_data["defaultAvatar"] = data.avatar_url
+
         if prisma_data:
             try:
                 await db.user.update(where={"id": user_id}, data=prisma_data)

@@ -27,7 +27,8 @@ class UserResponse(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     full_name: Optional[str] = None
-    avatar_url: Optional[str] = None
+    avatar_url: Optional[str] = "/Avatar1.svg"
+    default_avatar: Optional[str] = "/Avatar1.svg"
     role: Optional[str] = "cliente"
     created_at: Optional[str] = None
     app_metadata: Optional[dict[str, Any]] = None
@@ -50,3 +51,4 @@ class UserUpdateRequest(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = Field(None, min_length=6, description="Nova senha (opcional)")
     avatar_url: Optional[str] = None
+    default_avatar: Optional[str] = None

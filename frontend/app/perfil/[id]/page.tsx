@@ -17,6 +17,7 @@ interface UserProfile {
   last_name?: string | null;
   full_name?: string | null;
   avatar_url?: string | null;
+  default_avatar?: string | null;
   role?: string | null;
   created_at?: string | null;
   user_metadata?: Record<string, any> | null;
@@ -59,6 +60,8 @@ export default function UserProfilePage() {
         const photo =
           data.avatar_url ||
           data.user_metadata?.avatar_url ||
+          data.default_avatar ||
+          data.user_metadata?.default_avatar ||
           data.user_metadata?.picture ||
           "/Avatar1.svg";
 
@@ -92,17 +95,20 @@ export default function UserProfilePage() {
     lastName,
     email,
     avatarUrl,
+    defaultAvatar,
   }: {
     firstName: string;
     lastName: string;
     email: string;
     avatarUrl: string;
+    defaultAvatar?: string;
     password?: string;
   }) => {
     if (!profile) return;
 
     const updatedFullName = `${firstName} ${lastName}`.trim();
-    const updatedAvatar = avatarUrl || avatarSrc;
+    const updatedAvatar = avatarUrl || avatarSrc || defaultAvatar || "/Avatar1.svg";
+    const updatedDefaultAvatar = defaultAvatar || profile.default_avatar || "/Avatar1.svg";
 
     const updatedProfile: UserProfile = {
       ...profile,
@@ -111,6 +117,7 @@ export default function UserProfilePage() {
       full_name: updatedFullName,
       email: email,
       avatar_url: updatedAvatar,
+      default_avatar: updatedDefaultAvatar,
     };
 
     setProfile(updatedProfile);
@@ -128,6 +135,7 @@ export default function UserProfilePage() {
           last_name: lastName,
           full_name: updatedFullName,
           avatar_url: updatedAvatar,
+          default_avatar: updatedDefaultAvatar,
         };
         if (localStorage.getItem("partner_user")) {
           localStorage.setItem("partner_user", JSON.stringify(updatedLogged));
@@ -211,7 +219,7 @@ export default function UserProfilePage() {
               <button
                 onClick={() => setIsEditing(true)}
                 type="button"
-                className="bg-[#ea384c] hover:bg-[#d92d41] active:scale-95 text-white text-base md:text-lg font-semibold px-7 py-2.5 rounded-full flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
+                className="bg-[#ea384c] hover:bg-[#F14343] active:scale-95 text-white text-base md:text-lg font-semibold px-7 py-2.5 rounded-full flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <span>Editar Perfil</span>
                 <RiPencilFill size={18} />
@@ -256,6 +264,7 @@ export default function UserProfilePage() {
           initialLastName={profile.last_name || ""}
           initialEmail={profile.email || ""}
           initialAvatarUrl={avatarSrc}
+          initialDefaultAvatar={profile.default_avatar || profile.user_metadata?.default_avatar || "/Avatar1.svg"}
           onSave={handleSaveProfile}
         />
       )}

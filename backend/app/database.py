@@ -63,6 +63,17 @@ async def connect_prisma():
         await db.connect()
         logger.info("Prisma Client conectado ao Supabase PostgreSQL com sucesso.")
 
+async def ensure_prisma_connected():
+    """Garante que o Prisma Client esteja conectado, reconectando sob demanda se necessário."""
+    global db
+    if db is None:
+        from prisma import Prisma
+        db = Prisma(auto_register=True)
+    if not db.is_connected():
+        await db.connect()
+        logger.info("Prisma Client reconectado sob demanda com sucesso.")
+    return db
+
 async def disconnect_prisma():
     """Desconecta o Prisma Client."""
     global db

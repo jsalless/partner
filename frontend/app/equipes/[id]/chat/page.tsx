@@ -393,7 +393,6 @@ export default function TeamChatPage() {
       team_id: teamId,
       user_id: currentUserId || "eu",
       content: cleanContent,
-      type: "chat",
       channel: currentChannel,
       created_at: new Date().toISOString(),
       sender: currentUserData || {
@@ -416,7 +415,6 @@ export default function TeamChatPage() {
         },
         body: JSON.stringify({
           content: cleanContent,
-          type: "chat",
           channel: currentChannel,
           user_id: currentUserId,
         }),

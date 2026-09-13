@@ -65,7 +65,6 @@ interface ChatMessage {
   team_id: string;
   user_id: string;
   content: string;
-  type: "chat" | "progress" | "impediment" | "milestone";
   channel: string;
   created_at?: string | null;
   sender?: TeamMember | null;

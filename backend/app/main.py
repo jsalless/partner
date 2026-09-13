@@ -8,7 +8,6 @@ from app.routes.users import router as users_router
 from app.routes.teams import router as teams_router
 from app.routes.projects import router as projects_router
 from app.routes.notifications import router as notifications_router
-from app.routes.kanban import router as kanban_router
 from app.database import connect_prisma, disconnect_prisma, ensure_prisma_connected
 
 logger = logging.getLogger("uvicorn")
@@ -59,6 +58,7 @@ origins = set(ALLOWED_ORIGINS + [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=list(origins),
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -70,7 +70,6 @@ app.include_router(users_router)
 app.include_router(teams_router)
 app.include_router(projects_router)
 app.include_router(notifications_router)
-app.include_router(kanban_router)
 
 @app.get("/", tags=["Geral"])
 async def root():

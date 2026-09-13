@@ -1,4 +1,8 @@
-# 🚀 Partner — Gestão Ágil, Equipes & Dashboard Executivo
+<p align="center">
+  <img src="frontend/public/Readme.svg" alt="Partner" width="100%" />
+</p>
+
+# Partner — Gestão Ágil, Equipes & Dashboard Executivo
 
 <p align="center">
   <img src="https://img.shields.io/badge/Frontend-Next.js%2016-black?style=for-the-badge&logo=next.js" alt="Next.js" />
@@ -10,7 +14,7 @@
 
 ---
 
-## 📌 Sobre o Projeto
+## Sobre o Projeto
 
 O **Partner** é uma plataforma corporativa completa desenvolvida para transformar a gestão de projetos, a colaboração entre equipes multidisciplinares e a visualização de métricas executivas em tempo real.
 
@@ -18,16 +22,16 @@ Projetada com foco em performance, modernidade e usabilidade de alto nível, a s
 
 ---
 
-## ✨ Funcionalidades Principais
+## Funcionalidades Principais
 
-### 📊 1. Dashboard Executivo & Home
+### 1. Dashboard Executivo & Home
 - **KPIs em Tempo Real**: Métricas de Projetos Ativos, Tarefas na Sprint, Taxa de Entrega (94.2%) e Colaboradores Ativos.
 - **Membro do Mês**: Reconhecimento com destaque e métricas de desempenho (entregas realizadas e índice de aprovação).
 - **Meta de Faturamento Corporativo**: Acompanhamento visual da meta trimestral/anual com barra de progresso em gradiente, ticket médio, contratos vigentes e projeção financeira.
 - **Histórico & Feed de Atividades**: Linha do tempo com as últimas ações dos colaboradores em tarefas e projetos.
 - **Calendário Dinâmico de Entregas**: Visualização e filtro por mês com cronograma ordenado de prazos de projetos e tarefas críticas.
 
-### 📋 2. Projetos & Quadro Kanban
+### 2. Projetos & Quadro Kanban
 - Visão geral de projetos com status, orçamento, prazos e clientes vinculados.
 - Quadro **Kanban interativo** organizado nas etapas:
   - 📝 *A Fazer*
@@ -36,19 +40,19 @@ Projetada com foco em performance, modernidade e usabilidade de alto nível, a s
   - ✅ *Concluído*
 - Badges de prioridade (*Alta*, *Média*, *Baixa*) e modais rápidos para criação e atualização de tarefas.
 
-### 👥 3. Equipes & Comunicação Integrada
+### 3. Equipes & Comunicação Integrada
 - Gestão centralizada de equipes com suporte a times públicos e privados.
 - Atribuição de funções (Owner, Admin, Membro).
 - **Chat do Time**: Canais de discussão contextualizados por equipe e reações.
 
-### 🔐 4. Autenticação & Perfis
+### 4. Autenticação & Perfis
 - Login e controle de acesso com JWT e Supabase Auth.
 - Perfis de usuários com dados de contato, cargo e bio.
 - Contas de demonstração já semeadas e prontas para uso.
 
 ---
 
-## 🏗️ Arquitetura do Sistema
+## Arquitetura do Sistema
 
 ```text
                ┌────────────────────────┐
@@ -75,7 +79,7 @@ Projetada com foco em performance, modernidade e usabilidade de alto nível, a s
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 ### Frontend
 - **Framework**: [Next.js 16.3.4](https://nextjs.org/) (App Router & Turbopack)
@@ -98,7 +102,7 @@ Projetada com foco em performance, modernidade e usabilidade de alto nível, a s
 
 ---
 
-## 🚀 Como Executar Localmente
+## Como Executar Localmente
 
 ### Pré-requisitos
 - **Node.js** (v18+) e **npm**
@@ -193,21 +197,7 @@ cd partner
 
 ---
 
-## 🔑 Contas de Demonstração (Seed)
-
-Para acessar e navegar pelas equipes, projetos e dados:
-
-| E-mail | Senha Padrão | Função / Cargo |
-| :--- | :--- | :--- |
-| `ana.silva@partner.local` | `senha123@` | Tech Lead |
-| `carlos.eduardo@partner.local` | `senha123@` | Desenvolvedor Fullstack |
-| `beatriz.costa@partner.local` | `senha123@` | Product Owner |
-| `camila.duarte@partner.local` | `senha123@` | UX/UI Designer (Membro do Mês) |
-| `marcos.vinicius@partner.local` | `senha123@` | DevOps & Cloud |
-
----
-
-## 🌐 Deploy em Produção
+## Deploy em Produção
 
 - **Frontend**: [Vercel](https://vercel.com/)
   - **Root Directory**: `frontend`
@@ -218,7 +208,3 @@ Para acessar e navegar pelas equipes, projetos e dados:
   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
 ---
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Consulte o arquivo de licença para mais informações.

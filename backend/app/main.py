@@ -8,6 +8,7 @@ from app.routes.users import router as users_router
 from app.routes.teams import router as teams_router
 from app.routes.projects import router as projects_router
 from app.routes.notifications import router as notifications_router
+from app.routes.tasks import router as tasks_router
 from app.database import connect_prisma, disconnect_prisma, ensure_prisma_connected
 
 logger = logging.getLogger("uvicorn")
@@ -70,6 +71,7 @@ app.include_router(users_router)
 app.include_router(teams_router)
 app.include_router(projects_router)
 app.include_router(notifications_router)
+app.include_router(tasks_router)
 
 @app.get("/", tags=["Geral"])
 async def root():
@@ -85,3 +87,4 @@ async def root():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="0.0.0.0", port=BACKEND_PORT, reload=True)
+ 

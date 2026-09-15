@@ -10,3 +10,4 @@ class ProjectResponse(BaseModel):
     name: str
     description: Optional[str] = None
     created_at: Optional[str] = None
+    teams_count: Optional[int] = 0

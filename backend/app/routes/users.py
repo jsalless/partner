@@ -310,3 +310,46 @@ async def delete_user(user_id: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Erro ao excluir usuário: {str(e)}"
         )
+
+@router.get("/{user_id}/tasks")
+async def get_user_tasks(user_id: str):
+    """
+    Retorna as tarefas atribuídas ao usuário.
+    """
+    if db is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Banco de dados não conectado."
+        )
+        
+    tasks = await db.task.find_many(
+        where={"assigneeId": user_id},
+        order={"updatedAt": "desc"},
+        include={"assignee": True}
+    )
+    
+    result = []
+    if tasks:
+        for t in tasks:
+            result.append({
+                "id": t.id,
+                "kanban_id": t.kanban_id,
+                "title": t.title,
+                "description": t.description,
+                "status": t.status,
+                "priority": t.priority,
+                "due_date": str(t.due_date) if t.due_date else None,
+                "assignee_id": t.assigneeId,
+                "assignee": {
+                    "id": t.assignee.id,
+                    "email": t.assignee.email,
+                    "first_name": t.assignee.firstName,
+                    "last_name": t.assignee.lastName,
+                    "full_name": f"{t.assignee.firstName} {t.assignee.lastName}".strip(),
+                    "avatar_url": t.assignee.avatarUrl or t.assignee.defaultAvatar
+                } if t.assignee else None,
+                "created_at": str(t.createdAt) if t.createdAt else None,
+                "updated_at": str(t.updatedAt) if t.updatedAt else None
+            })
+    return result
+
